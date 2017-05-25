@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
@@ -16,10 +15,7 @@ import android.widget.Toast;
 
 import org.alicebot.ab.*;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -43,7 +39,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         if (view == findViewById(R.id.micButton)){
             /*promptSpeechInput();*/
             EditText inputstr = (EditText) findViewById(R.id.inputText);
-            speechText.setText(chat.multisentenceRespond(inputstr.getText().toString()));
+            String s=chat.multisentenceRespond(inputstr.getText().toString());
+            speechText.setText(s);
+            botSpeak(s,true);
         }
     }
     public void botSpeak(String s, boolean wannaFlush){
@@ -114,6 +112,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS){
             tts.setLanguage(Locale.getDefault());
+            tts.setPitch((float)1.3);
+            tts.setSpeechRate((float)0.9);
             canSpeak = true ;
         }
     }
@@ -128,19 +128,24 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         @Override
         protected Void doInBackground(Void... params) {
-            File fileExt = new File(getExternalFilesDir(null).getAbsolutePath()+"/bots");
-            ZipFileExtraction extract = new ZipFileExtraction();
-            if(!fileExt.exists())
-            {
+            try {
+                File fileExt = new File(getExternalFilesDir(null).getAbsolutePath()+"/bots");
+                ZipFileExtraction extract = new ZipFileExtraction();
+                if(!fileExt.exists())
+                    {
 
-                try
-                {
-                    extract.unZipIt(getAssets().open("deploy.zip"), getExternalFilesDir(null).getAbsolutePath()+"/");
-                } catch (Exception e) { e.printStackTrace(); }
-            }
-            MagicStrings.root_path = getExternalFilesDir(null).getAbsolutePath();
-            Bot bot = new Bot("alice2", MagicStrings.root_path);
-            chat = new Chat(bot);
+                        try
+                        {
+                            extract.unZipIt(getAssets().open("deploy.zip"), getExternalFilesDir(null).getAbsolutePath()+"/");
+                        } catch (Exception e) { e.printStackTrace(); }
+                    }
+                MagicStrings.root_path = getExternalFilesDir(null).getAbsolutePath();
+                Bot bot = new Bot("alice2", MagicStrings.root_path);
+                chat = new Chat(bot);
+                }
+                catch (NullPointerException e){
+                    Toast.makeText(MainActivity.this, "Storage Problem ", Toast.LENGTH_LONG).show();
+                }
             return null;
         }
 

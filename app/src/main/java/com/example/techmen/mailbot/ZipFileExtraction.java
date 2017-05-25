@@ -13,7 +13,6 @@ import java.util.zip.ZipInputStream;
  */
 
 public class ZipFileExtraction {
-    static int sum = 0;
     public void unZipIt(InputStream zipFile, String outputFolder) {
         try {
             //get the zip file content
@@ -32,7 +31,6 @@ public class ZipFileExtraction {
                 } else {
                     FileOutputStream fos = new FileOutputStream(outputFolder + entry.getName());
                     while ((bytesRead = zin.read(buffer)) != -1) {
-                        sum = sum + 4096;
                         fos.write(buffer, 0, bytesRead);
                     }
                     fos.close();
@@ -42,8 +40,5 @@ public class ZipFileExtraction {
         } catch(Exception e) {
             e.printStackTrace();
         }
-    }
-    public int getTotal(){
-        return sum;
     }
 }
